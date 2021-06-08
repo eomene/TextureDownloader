@@ -37,10 +37,9 @@ If you are using this tool with data that comes from a server. For example, you 
     {
         public string name;
         /// <summary>
- /// Url for image or local name in the Downloaded textures dictionary (if you  have the image locally assigned)
+        /// Url for image or local name in the Downloaded textures dictionary (if you  have the image locally assigned)
         /// </summary>
         public string url { get => serialisedUrl; set => serialisedUrl = value; }
-
         public string serialisedUrl;
         /// <summary>
         /// Callback for when image is available
