@@ -1,6 +1,6 @@
 # DOCUMENTATION
 
-## Install from Unity Package Manager (Recommended)
+## INSTALLATION USING UNITY PACKAGE MANAGER
 
 ### USING GIT
 
