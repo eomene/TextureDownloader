@@ -1,15 +1,15 @@
-DOCUMENTATION
-MAKING LOCAL TEXTURES AVAILABLE
-METHOD 1: 
+# DOCUMENTATION
+## MAKING LOCAL TEXTURES AVAILABLE
+### METHOD 1: 
 This system can access local textures if you put all textures in the folder “Resources/CradaptiveTextures”. You can have multiple folders of this.
-METHOD 2: 
+###METHOD 2: 
 Create a new gameobject, attach the “CradaptiveTexturesDownloader” component to it. 
  
 Click on the plus button and add your local textures you which to have available. 
 Make sure to assign the sprite as well as the url or name you which to use as a key to access this sprite.
-GETTING TEXTURES FROM SERVER DATA
+## GETTING TEXTURES FROM SERVER DATA
 If you are using this tool with data that comes from a server. For example, you expect a json response with a url link. Just implement the interface in your base data class. 
-Example :
+### Example :
     [System.Serializable]
     public class CradaptiveSimpleData : ICradaptiveTextureOwner
     {
@@ -28,6 +28,7 @@ Example :
 
 Now in your prefab, you can easily ask for a texture by passing that data to the texture download system. By doing the following:
 You only need to set the callback which expects an action with a sprite variable. This would be called as soon as a response returns. Note that if your texture is local. This should be almost instant. 
+
         public void Init(CradaptiveSimpleData cradaptiveSimpleData)
         {
             cradaptiveSimpleData.OnTextureAvailable = (spr) =>
@@ -38,8 +39,9 @@ You only need to set the callback which expects an action with a sprite variable
             CradaptiveTexturesDownloader.QueueForDownload(cradaptiveSimpleData);
         }
 
-GETTING TEXTURES FROM LOCAL DATA
+## GETTING TEXTURES FROM LOCAL DATA
 If you intend to use the local textures, and have probably assigned the textures to the system or placed in the resources folder. You can easily access the textures anywhere by initializing a struct.
+
         public void Init()
         {
             TextureDownloadRequest textureDownloadRequest = new TextureDownloadRequest();
