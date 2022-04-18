@@ -44,7 +44,7 @@ If you are using this tool with data that comes from a server. For example, you 
         /// <summary>
         /// Callback for when image is available
         /// </summary>
-        public Action<Sprite> OnTextureAvailable { get; set; }
+        public Action<Sprite,string> OnTextureAvailable { get; set; }
     }
 
 Now in your prefab, you can easily ask for a texture by passing that data to the texture download system. By doing the following:
@@ -52,7 +52,7 @@ You only need to set the callback which expects an action with a sprite variable
 
         public void Init(CradaptiveSimpleData cradaptiveSimpleData)
         {
-            cradaptiveSimpleData.OnTextureAvailable = (spr) =>
+            cradaptiveSimpleData.OnTextureAvailable = (spr,res) =>
             {
                 if(image)
                 image.sprite = spr;
@@ -67,7 +67,7 @@ If you intend to use the local textures, and have probably assigned the textures
         {
             TextureDownloadRequest textureDownloadRequest = new TextureDownloadRequest();
             textureDownloadRequest.url = url;
-            textureDownloadRequest.OnTextureAvailable = (spr) =>
+            textureDownloadRequest.OnTextureAvailable = (spr,res) =>
             {
                 image.sprite = spr;
             };
