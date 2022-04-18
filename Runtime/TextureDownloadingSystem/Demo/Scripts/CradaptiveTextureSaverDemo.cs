@@ -20,7 +20,7 @@ namespace Cradaptive.MultipleTextureDownloadSystem.Demo
         /// <summary>
         /// Callback for when image is available
         /// </summary>
-        public Action<Sprite> OnTextureAvailable { get; set; }
+        public Action<Sprite,string> OnTextureAvailable { get; set; }
 
     }
 

@@ -6,11 +6,19 @@ using UnityEngine;
 
 namespace Cradaptive.MultipleTextureDownloadSystem
 {
+    public enum DownloadType
+    {
+        local,
+        web,
+        assetBundle
+    };
     [System.Serializable]
     public class CradaptiveTextureRequestsCache
     {
-        public List<Action<Sprite>> actions;
+        public List<Action<Sprite,string>> actions;
         public string url;
+        public int downloadAttempts;
+        public DownloadType currentDownloadType;
     }
 
     [System.Serializable]

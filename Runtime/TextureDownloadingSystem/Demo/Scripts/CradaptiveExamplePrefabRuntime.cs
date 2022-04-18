@@ -20,7 +20,7 @@ namespace Cradaptive.MultipleTextureDownloadSystem.Demo
         {
             TextureDownloadRequest textureDownloadRequest = new TextureDownloadRequest();
             textureDownloadRequest.url = url;
-            textureDownloadRequest.OnTextureAvailable = (spr) =>
+            textureDownloadRequest.OnTextureAvailable = (spr,response) =>
             {
                 image.sprite = spr;
             };

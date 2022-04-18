@@ -14,12 +14,16 @@ namespace Cradaptive.MultipleTextureDownloadSystem
         /// <summary>
         /// Fired as soon as we get a texture from the url
         /// </summary>
-        Action<Sprite> OnTextureAvailable { set; get; }
+        Action<Sprite,string> OnTextureAvailable { set; get; }
     }
 
     struct TextureDownloadRequest : ICradaptiveTextureOwner
     {
         public string url { get; set; }
-        public Action<Sprite> OnTextureAvailable { get ; set ; }
+        public Action<Sprite,string> OnTextureAvailable { get ; set ; }
+    }
+    public interface ICradaptiveDownloadLocation
+    {
+        DownloadType currentDownloadType { get; }
     }
 }

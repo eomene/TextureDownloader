@@ -12,10 +12,10 @@ namespace Cradaptive.MultipleTextureDownloadSystem.Demo
 
         public void Init(CradaptiveSimpleData cradaptiveSimpleData)
         {
-            cradaptiveSimpleData.OnTextureAvailable = (spr) =>
+            cradaptiveSimpleData.OnTextureAvailable = (spr, response) =>
             {
-                if(image)
-                image.sprite = spr;
+                if (image)
+                    image.sprite = spr;
             };
             CradaptiveTexturesDownloader.QueueForDownload(cradaptiveSimpleData);
         }
