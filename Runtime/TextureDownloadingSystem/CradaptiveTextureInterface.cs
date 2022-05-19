@@ -17,7 +17,7 @@ namespace Cradaptive.MultipleTextureDownloadSystem
         Action<Sprite,string> OnTextureAvailable { set; get; }
     }
 
-    struct TextureDownloadRequest : ICradaptiveTextureOwner
+    public struct TextureDownloadRequest : ICradaptiveTextureOwner
     {
         public string url { get; set; }
         public Action<Sprite,string> OnTextureAvailable { get ; set ; }
