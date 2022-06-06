@@ -8,10 +8,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+#if USE_ADDRESSABLES
 using UnityEngine.AddressableAssets;
-using UnityEngine.Networking;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.UI;
+using UnityEngine.ResourceManagement.ResourceLocations;
+#endif
+using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 
 
@@ -20,6 +22,7 @@ namespace Cradaptive.MultipleTextureDownloadSystem
     public class CradaptiveTexturesDownloader : MonoBehaviour
     {
         private static CradaptiveTexturesDownloader Instance;
+
         private static CradativeTextureRequestsCacheDictionary screenShotDownloadQueue =
             new CradativeTextureRequestsCacheDictionary();
 
@@ -176,13 +179,14 @@ namespace Cradaptive.MultipleTextureDownloadSystem
 #endif
         }
 
-        private static Sprite CreateSprite(Texture2D texture)
+        private static Sprite CreateSprite(Texture2D texture, string name)
         {
             if (texture == null)
             {
-                Debug.LogError($"No texture for asset {texture.name}");
+                // Debug.LogError($"No texture for asset {name}");
                 return null;
             }
+
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height),
                 new Vector2(0.5f, 0.5f));
             return sprite;
@@ -191,16 +195,34 @@ namespace Cradaptive.MultipleTextureDownloadSystem
         private static void SendCallbackResult(CradaptiveTextureRequestsCache processingObject, Texture2D texture,
             string message)
         {
-            var sprite = CreateSprite(texture);
+            string errorMessage = $"No texture for asset {processingObject.url}";
+            if (texture == null)
+            {
+                Instance.UpdateProcessingObjects(processingObject, null, errorMessage);
+                Debug.LogError(errorMessage);
+                return;
+            }
+
+            var sprite = CreateSprite(texture, processingObject.url);
+            Instance.UpdateProcessingObjects(processingObject, sprite, message);
+            if (sprite == null)
+            {
+                Instance.UpdateProcessingObjects(processingObject, null, errorMessage);
+                //   Debug.LogError(errorMessage);
+                return;
+            }
+
+            if (!Instance.downloadedTextures.Contains(processingObject.url))
+                Instance.downloadedTextures.Add(new CradaptiveTextureCache
+                    {url = processingObject.url, sprite = sprite});
+        }
+
+        void UpdateProcessingObjects(CradaptiveTextureRequestsCache processingObject, Sprite sprite, string message)
+        {
             for (int i = 0; i < processingObject.actions.Count; i++)
             {
                 processingObject.actions[i]?.Invoke(sprite, message);
             }
-
-            if (sprite == null) return;
-            if (!Instance.downloadedTextures.Contains(processingObject.url))
-                Instance.downloadedTextures.Add(new CradaptiveTextureCache
-                    {url = processingObject.url, sprite = sprite});
         }
     }
 }
