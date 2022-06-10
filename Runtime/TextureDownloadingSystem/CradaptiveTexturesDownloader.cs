@@ -185,7 +185,7 @@ namespace Cradaptive.MultipleTextureDownloadSystem
 #endif
         }
 
-        private static Sprite CreateSprite(Texture2D texture, string name)
+        public static Sprite CreateSprite(Texture2D texture, string name)
         {
             if (texture == null)
             {
