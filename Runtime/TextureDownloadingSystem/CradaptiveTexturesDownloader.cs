@@ -28,8 +28,8 @@ namespace Cradaptive.MultipleTextureDownloadSystem
 
         public CradativeTextureCacheDictionary downloadedTextures = new CradativeTextureCacheDictionary();
         public Texture2D defaultTexture;
-
         private bool isInitialised;
+        public List<string> badListOfFailedTextxures = new List<string>();
 
         public void Awake()
         {
@@ -62,7 +62,7 @@ namespace Cradaptive.MultipleTextureDownloadSystem
         {
             Initialise();
 
-            if (previewOwner == null || string.IsNullOrEmpty(previewOwner.url)) return;
+            if (previewOwner == null || string.IsNullOrEmpty(previewOwner.url) || Instance.badListOfFailedTextxures.Contains(previewOwner.url)) return;
 
             if (Instance.downloadedTextures.Contains(previewOwner.url))
             {
@@ -137,8 +137,14 @@ namespace Cradaptive.MultipleTextureDownloadSystem
             {
                 Debug.LogError("Error: " + processingObject.url + "/" + uwr.error + uwr.downloadHandler?.text);
                 if (processingObject.downloadAttempts <= 3)
+                {
                     screenShotDownloadQueue.Add(processingObject);
-                SendCallbackResult(processingObject, null, "Failed trials to download from server");
+                }
+                else
+                {
+                    Instance.badListOfFailedTextxures.Add(processingObject.url);
+                    SendCallbackResult(processingObject, null, "Failed trials to download from server");
+                }
             }
             else
             {
