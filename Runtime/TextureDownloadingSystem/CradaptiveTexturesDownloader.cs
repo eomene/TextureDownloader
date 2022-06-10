@@ -29,6 +29,8 @@ namespace Cradaptive.MultipleTextureDownloadSystem
         public CradativeTextureCacheDictionary downloadedTextures = new CradativeTextureCacheDictionary();
         public Texture2D defaultTexture;
 
+        private bool isInitialised;
+
         public void Awake()
         {
             Instance = this;
@@ -43,6 +45,10 @@ namespace Cradaptive.MultipleTextureDownloadSystem
                 Instance = downloader.AddComponent<CradaptiveTexturesDownloader>();
             }
 
+            if (Instance.isInitialised)
+                return;
+
+            Instance.isInitialised = true;
             Sprite[] loadedSprites = Resources.LoadAll<Sprite>("CradaptiveTextures");
             for (int i = 0; i < loadedSprites.Length; i++)
             {
