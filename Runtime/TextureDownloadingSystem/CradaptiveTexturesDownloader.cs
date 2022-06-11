@@ -30,39 +30,49 @@ namespace Cradaptive.MultipleTextureDownloadSystem
         public Texture2D defaultTexture;
         private bool isInitialised;
         public List<string> badListOfFailedTextxures = new List<string>();
+        private static CradaptiveTextureConfig cradaptiveTextureConfig;
 
         public void Awake()
         {
-            Instance = this;
-            Initialise();
+            cradaptiveTextureConfig =
+                Resources.Load<CradaptiveTextureConfig>("CradaptiveTexturesSettings/CradaptiveTextureConfig");
+            if (cradaptiveTextureConfig.initOnAwake)
+                Initialise();
         }
 
-        private static void Initialise()
+        public static void Initialise()
         {
             if (Instance == null)
             {
                 GameObject downloader = new GameObject("CradaptiveTextureDownloader");
                 Instance = downloader.AddComponent<CradaptiveTexturesDownloader>();
+                if (cradaptiveTextureConfig.dontDestroyOnLoad)
+                    DontDestroyOnLoad(Instance.gameObject);
             }
-
+ 
             if (Instance.isInitialised)
                 return;
 
-            Instance.isInitialised = true;
-            Sprite[] loadedSprites = Resources.LoadAll<Sprite>("CradaptiveTextures");
-            for (int i = 0; i < loadedSprites.Length; i++)
+            if (cradaptiveTextureConfig.useResourcesFolderAssets)
             {
-                if (!Instance.downloadedTextures.Contains(loadedSprites[i].name))
-                    Instance.downloadedTextures.Add(new CradaptiveTextureCache
-                        {sprite = loadedSprites[i], url = loadedSprites[i].name});
+                Sprite[] loadedSprites = Resources.LoadAll<Sprite>(cradaptiveTextureConfig.pathToResourcesFolder);
+                for (int i = 0; i < loadedSprites.Length; i++)
+                {
+                    if (!Instance.downloadedTextures.Contains(loadedSprites[i].name))
+                        Instance.downloadedTextures.Add(new CradaptiveTextureCache
+                            {sprite = loadedSprites[i], url = loadedSprites[i].name});
+                }
             }
+
+            Instance.isInitialised = true;
         }
 
         public static void QueueForDownload(ICradaptiveTextureOwner previewOwner)
         {
             Initialise();
 
-            if (previewOwner == null || string.IsNullOrEmpty(previewOwner.url) || Instance.badListOfFailedTextxures.Contains(previewOwner.url)) return;
+            if (previewOwner == null || string.IsNullOrEmpty(previewOwner.url) ||
+                Instance.badListOfFailedTextxures.Contains(previewOwner.url)) return;
 
             if (Instance.downloadedTextures.Contains(previewOwner.url))
             {
