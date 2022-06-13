@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - Development
+
+jobs:
+  create-unitypackage:
+    name: Create Package 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: create unity package branch 
+        run: |
+          git branch -d main &> /dev/null || echo main branch not found
+          git subtree split -P "Assets/Packages/TextureDownloadingSystem" -b main
+          git checkout main
+          git push -f -u origin main
