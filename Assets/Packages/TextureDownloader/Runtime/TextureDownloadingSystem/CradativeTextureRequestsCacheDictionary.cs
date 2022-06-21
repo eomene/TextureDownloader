@@ -12,10 +12,11 @@ namespace Cradaptive.MultipleTextureDownloadSystem
         web,
         assetBundle
     };
+
     [System.Serializable]
     public class CradaptiveTextureRequestsCache
     {
-        public List<Action<Sprite,string>> actions;
+        public List<Action<Sprite, string>> actions;
         public string url;
         public int downloadAttempts;
         public DownloadType currentDownloadType;
@@ -25,6 +26,7 @@ namespace Cradaptive.MultipleTextureDownloadSystem
     public class CradativeTextureRequestsCacheDictionary
     {
         public List<CradaptiveTextureRequestsCache> textureSaveClasses = new List<CradaptiveTextureRequestsCache>();
+
         public bool Contains(string url)
         {
             CradaptiveTextureRequestsCache textureSaveClass = textureSaveClasses.FirstOrDefault(x => x.url == url);
@@ -43,14 +45,19 @@ namespace Cradaptive.MultipleTextureDownloadSystem
             if (!Contains(textureSaveClass.url))
                 textureSaveClasses.Add(textureSaveClass);
         }
+
         public void Remove(CradaptiveTextureRequestsCache textureSaveClass)
         {
+            if(textureSaveClass==null)
+                return;
             if (Contains(textureSaveClass.url))
                 textureSaveClasses.Remove(textureSaveClass);
         }
+
         public void Remove(ICradaptiveTextureOwner url)
         {
-            CradaptiveTextureRequestsCache[] textureSaveClass = textureSaveClasses.Where(x => x.url == url.url).ToArray();
+            CradaptiveTextureRequestsCache[] textureSaveClass =
+                textureSaveClasses.Where(x => x.url == url.url).ToArray();
 
             if (textureSaveClass != null)
             {
@@ -61,12 +68,14 @@ namespace Cradaptive.MultipleTextureDownloadSystem
                 }
             }
         }
+
         public void Remove(string url)
         {
             CradaptiveTextureRequestsCache textureSaveClass = textureSaveClasses.FirstOrDefault(x => x.url == url);
             if (textureSaveClass != null)
                 Remove(textureSaveClass);
         }
+
         public CradaptiveTextureRequestsCache GetTextureSaveClass(string url)
         {
             CradaptiveTextureRequestsCache textureSaveClass = textureSaveClasses.FirstOrDefault(x => x.url == url);
@@ -74,6 +83,7 @@ namespace Cradaptive.MultipleTextureDownloadSystem
                 return textureSaveClass;
             return null;
         }
+
         public CradaptiveTextureRequestsCache GetTextureSaveClass(ICradaptiveTextureOwner url)
         {
             CradaptiveTextureRequestsCache textureSaveClass = textureSaveClasses.FirstOrDefault(x => x.url == url.url);
@@ -81,12 +91,13 @@ namespace Cradaptive.MultipleTextureDownloadSystem
                 return textureSaveClass;
             return null;
         }
+
         public CradaptiveTextureRequestsCache First()
         {
-            CradaptiveTextureRequestsCache textureSaveClass = textureSaveClasses.First();
-            if (textureSaveClass != null)
-                return textureSaveClass;
-            return null;
+            CradaptiveTextureRequestsCache textureSaveClass = textureSaveClasses != null && textureSaveClasses.Count > 0
+                ? textureSaveClasses.First()
+                : null;
+            return textureSaveClass;
         }
 
         public int Count()
@@ -94,5 +105,4 @@ namespace Cradaptive.MultipleTextureDownloadSystem
             return textureSaveClasses.Count();
         }
     }
-
 }

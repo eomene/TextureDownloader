@@ -13,6 +13,7 @@ public class CradaptiveTextureConfig : ScriptableObject
     public bool dontDestroyOnLoad = true;
     public bool useResourcesFolderAssets = true;
     public bool enableAddressables = false;
+    public int maximumNoOfDownloads = 7;
 
     [ContextMenu("Enable Addressables")]
     public void EnableAddressables()

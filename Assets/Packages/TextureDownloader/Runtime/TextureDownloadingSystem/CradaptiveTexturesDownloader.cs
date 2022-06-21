@@ -28,9 +28,10 @@ namespace Cradaptive.MultipleTextureDownloadSystem
 
         public CradativeTextureCacheDictionary downloadedTextures = new CradativeTextureCacheDictionary();
         public Texture2D defaultTexture;
-        private bool isInitialised;
+        private static bool isInitialised;
         public List<string> badListOfFailedTextxures = new List<string>();
         private static CradaptiveTextureConfig cradaptiveTextureConfig;
+        private int currentDownloadingCount;
 
         public void Awake()
         {
@@ -42,6 +43,10 @@ namespace Cradaptive.MultipleTextureDownloadSystem
 
         public static void Initialise()
         {
+            if (isInitialised)
+                return;
+            isInitialised = true;
+
             if (Instance == null)
             {
                 GameObject downloader = new GameObject("CradaptiveTextureDownloader");
@@ -49,9 +54,7 @@ namespace Cradaptive.MultipleTextureDownloadSystem
                 if (cradaptiveTextureConfig.dontDestroyOnLoad)
                     DontDestroyOnLoad(Instance.gameObject);
             }
- 
-            if (Instance.isInitialised)
-                return;
+
 
             if (cradaptiveTextureConfig.useResourcesFolderAssets)
             {
@@ -63,8 +66,6 @@ namespace Cradaptive.MultipleTextureDownloadSystem
                             {sprite = loadedSprites[i], url = loadedSprites[i].name});
                 }
             }
-
-            Instance.isInitialised = true;
         }
 
         public static void QueueForDownload(ICradaptiveTextureOwner previewOwner)
@@ -95,12 +96,25 @@ namespace Cradaptive.MultipleTextureDownloadSystem
                     actions = new List<Action<Sprite, string>> {previewOwner.OnTextureAvailable},
                     currentDownloadType = localTexture?.currentDownloadType ?? DownloadType.web
                 });
-                Instance.StartCoroutine(DownloadPreviewImagesAsync());
+                
+                if (Instance.currentDownloadingCount > cradaptiveTextureConfig.maximumNoOfDownloads)
+                {
+                    Debug.LogError("Taking a break from downloading for a while");
+                    Instance.Invoke(nameof(StartFetching),0.5f);
+                    return;
+                }
+
+                Instance.StartFetching();
             }
             else
             {
                 screenShotDownloadQueue.AddCallbackAction(previewOwner);
             }
+        }
+
+        public void StartFetching()
+        {
+            Instance.StartCoroutine(DownloadPreviewImagesAsync());
         }
 
         private static IEnumerator DownloadPreviewImagesAsync()
@@ -114,6 +128,7 @@ namespace Cradaptive.MultipleTextureDownloadSystem
                     processingObject = screenShotDownloadQueue.First();
                     screenShotDownloadQueue.Remove(processingObject);
                     processingObject.downloadAttempts++;
+                    Instance.currentDownloadingCount++;
                 }
 
                 switch (processingObject.currentDownloadType)
@@ -154,12 +169,14 @@ namespace Cradaptive.MultipleTextureDownloadSystem
                 {
                     Instance.badListOfFailedTextxures.Add(processingObject.url);
                     SendCallbackResult(processingObject, null, "Failed trials to download from server");
+                    Instance.currentDownloadingCount--;
                 }
             }
             else
             {
                 Texture2D texture = DownloadHandlerTexture.GetContent(uwr);
                 SendCallbackResult(processingObject, texture, "");
+                Instance.currentDownloadingCount--;
             }
         }
 
@@ -196,7 +213,8 @@ namespace Cradaptive.MultipleTextureDownloadSystem
                 SendCallbackResult(processingObject, null, opHandle.OperationException.Message);
             }
 #else
-            SendCallbackResult(processingObject, null, "Addressables not enabled, please install addresables package and add define symbols");
+            SendCallbackResult(processingObject, null,
+                "Addressables not enabled, please install addresables package and add define symbols");
             Debug.LogError("Addressables not enabled, please install addresables package and add define symbols");
 #endif
         }

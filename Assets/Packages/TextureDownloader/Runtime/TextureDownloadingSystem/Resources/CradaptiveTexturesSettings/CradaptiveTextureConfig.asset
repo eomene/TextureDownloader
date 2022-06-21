@@ -15,3 +15,7 @@ MonoBehaviour:
   initOnAwake: 1
   pathToResourcesFolder: CradaptiveTextures
   tagToAddressables: CradaptiveTextures
+  dontDestroyOnLoad: 0
+  useResourcesFolderAssets: 1
+  enableAddressables: 0
+  maximumNoOfDownloads: 7
