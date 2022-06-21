@@ -96,13 +96,7 @@ namespace Cradaptive.MultipleTextureDownloadSystem
                     actions = new List<Action<Sprite, string>> {previewOwner.OnTextureAvailable},
                     currentDownloadType = localTexture?.currentDownloadType ?? DownloadType.web
                 });
-                
-                if (Instance.currentDownloadingCount > cradaptiveTextureConfig.maximumNoOfDownloads)
-                {
-                    Debug.LogError("Taking a break from downloading for a while");
-                    Instance.Invoke(nameof(StartFetching),0.5f);
-                    return;
-                }
+
 
                 Instance.StartFetching();
             }
@@ -119,7 +113,8 @@ namespace Cradaptive.MultipleTextureDownloadSystem
 
         private static IEnumerator DownloadPreviewImagesAsync()
         {
-            if (screenShotDownloadQueue.Count() > 0)
+            if (screenShotDownloadQueue.Count() > 0 &&
+                cradaptiveTextureConfig.maximumNoOfDownloads > Instance.currentDownloadingCount)
             {
                 CradaptiveTextureRequestsCache processingObject;
 
@@ -160,7 +155,9 @@ namespace Cradaptive.MultipleTextureDownloadSystem
             if (uwr.result == UnityWebRequest.Result.ConnectionError ||
                 uwr.result == UnityWebRequest.Result.ProtocolError)
             {
+#if UNITY_EDITOR
                 Debug.LogError("Error: " + processingObject.url + "/" + uwr.error + uwr.downloadHandler?.text);
+#endif
                 if (processingObject.downloadAttempts <= 3)
                 {
                     screenShotDownloadQueue.Add(processingObject);
@@ -189,10 +186,12 @@ namespace Cradaptive.MultipleTextureDownloadSystem
                 Texture2D loadedTexture = new Texture2D(8, 8);
                 loadedTexture.LoadImage(byteArray);
                 SendCallbackResult(processingObject, loadedTexture, "");
+                Instance.currentDownloadingCount--;
             }
             catch (Exception e)
             {
                 SendCallbackResult(processingObject, null, e.Message);
+                Instance.currentDownloadingCount--;
             }
         }
 
@@ -207,10 +206,12 @@ namespace Cradaptive.MultipleTextureDownloadSystem
             {
                 Texture2D loadedTexture = opHandle.Result;
                 SendCallbackResult(processingObject, loadedTexture, "");
+  Instance.currentDownloadingCount--;
             }
             else
             {
                 SendCallbackResult(processingObject, null, opHandle.OperationException.Message);
+  Instance.currentDownloadingCount--;
             }
 #else
             SendCallbackResult(processingObject, null,
@@ -239,7 +240,9 @@ namespace Cradaptive.MultipleTextureDownloadSystem
             if (texture == null)
             {
                 Instance.UpdateProcessingObjects(processingObject, null, errorMessage);
+#if UNITY_EDITOR
                 Debug.LogError(errorMessage);
+#endif
                 return;
             }
 
