@@ -18,4 +18,4 @@ MonoBehaviour:
   dontDestroyOnLoad: 0
   useResourcesFolderAssets: 1
   enableAddressables: 0
-  maximumNoOfDownloads: 7
+  maximumNoOfDownloads: 5
